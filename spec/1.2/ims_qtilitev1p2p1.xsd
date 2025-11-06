@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- filename=ims_qtilitev1p2.xsd -->
+<!-- Copyright (2) 2002 IMS Global Learning Consortium, Inc. -->
+<xs:schema targetNamespace="http://www.imsglobal.org/xsd/ims_qtilitev1p2" 
+	xmlns="http://www.imsglobal.org/xsd/ims_qtilitev1p2" 
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+	version="IMS QTI LITE 1.2.1">
+	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+	
+	<xs:annotation>
+		<xs:documentation>
+			XSD Data File Information
+			-------------------------
+			Author:         Colin Smythe
+			Date:           25th January, 2008
+			Version:        1.0
+			Status:         Draft
+			Description:    This is the XSD for the IMS ASI Question and Test Interoperability LLite v1.2.1 specification.
+							This defines how simple questions (Items) are to be exchanged.  It includes the definition of 
+							the item structures that is simplified from the full QTI specification.
+			
+			History:        This is the first attempt to create the XSD description of the QTIv1.2.1 Lite specification.
+			
+			Copyright:      2005-2008 (c) IMS Global Learning Consortium Inc.  All Rights Reserved.
+							IMS Global Learning Consortium, Inc. (IMS GLC) is publishing the information
+							contained in this binding ("Specification") for purposes of scientific
+							experimental and scholarly collaboration only.  IMS GLC makes no warranty or 
+							representation regarding the accuracy or completeness of the Specification.
+							This material is provided on an "As Is" and "As Available basis".
+							The Specification is at all times subject to change and revision without
+							notice. It is your sole responsibility to evaluate the usefulness, accuracy
+							and completeness of the Specification as it relates to you.  IMS GLC would
+							appreciate receiving your comments and suggestions.  Please contact IMS GLC
+							through our website at: http://www.imsglobal.org.	
+		</xs:documentation>
+	</xs:annotation>
+	
+	<!-- ****************** -->
+	<!-- ** Root Element ** -->
+	<!-- ****************** -->
+	
+	<xs:element name="questestinterop" type="questestinteropType"/>
+	
+	<!-- ************************** -->
+	<!-- ** Element Declarations ** -->
+	<!-- ************************** -->
+	
+	<xs:element name="altmaterial" type="altmaterialType"/>
+	<xs:element name="conditionvar" type="conditionvarType"/>
+	<xs:element name="decvar" type="decvarType"/>
+	<xs:element name="displayfeedback" type="displayfeedbackType"/>
+	<xs:element name="item" type="itemType"/>
+	<xs:element name="itemfeedback" type="itemfeedbackType"/>
+	<xs:element name="matemtext" type="matemtextType"/>
+	<xs:element name="material" type="materialType"/>
+	<xs:element name="matimage" type="matimageType"/>
+	<xs:element name="matref" type="matrefType"/>
+	<xs:element name="mattext" type="mattextType"/>
+	<xs:element name="not" type="notType"/>
+	<xs:element name="objectives" type="objectivesType"/>
+	<xs:element name="outcomes" type="outcomesType"/>
+	<xs:element name="other" type="xs:string"/>
+	<xs:element name="presentation" type="presentationType"/>
+	<xs:element name="render_choice" type="render_choiceType"/>
+	<xs:element name="respcondition" type="respconditionType"/>
+	<xs:element name="response_label" type="response_labelType"/>
+	<xs:element name="response_lid" type="response_lidType"/>
+	<xs:element name="resprocessing" type="resprocessingType"/>
+	<xs:element name="rubric" type="rubricType"/>
+	<xs:element name="setvar" type="setvarType"/>
+	<xs:element name="unanswered" type="unansweredType"/>
+	<xs:element name="varequal" type="varequalType"/>
+	
+	<!-- ***************** -->
+	<!-- ** altmaterial ** -->
+	<!-- ***************** -->	
+	<xs:complexType name="altmaterialType">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="mattext" type="mattextType"/>
+			<xs:element name="matemtext" type="matemtextType"/>
+			<xs:element name="matimage" type="matimageType"/>
+			<xs:element name="matref" type="matrefType"/>
+		</xs:choice>
+		<xs:attribute ref="xml:lang"/>
+	</xs:complexType>
+	
+	<!-- ****************** -->
+	<!-- ** conditionvar ** -->
+	<!-- ****************** -->	
+	<xs:complexType name="conditionvarType">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="not" type="notType"/>
+			<xs:element name="unanswered" type="unansweredType"/>
+			<xs:element name="varequal" type="varequalType"/>
+		</xs:choice>
+	</xs:complexType>
+	
+	<!-- ************ -->
+	<!-- ** decvar ** -->
+	<!-- ************ -->	
+	<xs:complexType name="decvarType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="varname" type="xs:string" default="SCORE"/>
+				<xs:attribute name="vartype" default="Integer">
+					<xs:simpleType>
+						<xs:restriction base="xs:NMTOKEN">
+							<xs:enumeration value="Integer"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="defaultval" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<!-- ********************* -->
+	<!-- ** displayfeedback ** -->
+	<!-- ********************* -->
+	<xs:complexType name="displayfeedbackType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="feedbacktype" default="Response">
+					<xs:simpleType>
+						<xs:restriction base="xs:NMTOKEN">
+							<xs:enumeration value="Response"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="linkrefid" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<!-- ********** -->
+	<!-- ** item ** -->
+	<!-- ********** -->
+	<xs:complexType name="itemType">
+		<xs:sequence>
+			<xs:element name="objectives" type="objectivesType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="rubric" type="rubricType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="presentation" type="presentationType" minOccurs="0"/>
+			<xs:element name="resprocessing" type="resprocessingType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="itemfeedback" type="itemfeedbackType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="label" type="xs:string"/>
+		<xs:attribute name="ident" type="xs:string" use="required"/>
+		<xs:attribute name="title" type="xs:string"/>
+	</xs:complexType>
+	
+	<!-- ****************** -->
+	<!-- ** itemfeedback ** -->
+	<!-- ****************** -->
+	<xs:complexType name="itemfeedbackType">
+		<xs:sequence>
+			<xs:element name="material" type="materialType" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="view" default="All">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="All"/>
+					<xs:enumeration value="Administrator"/>
+					<xs:enumeration value="AdminAuthority"/>
+					<xs:enumeration value="Assessor"/>
+					<xs:enumeration value="Author"/>
+					<xs:enumeration value="Candidate"/>
+					<xs:enumeration value="InvigilatorProctor"/>
+					<xs:enumeration value="Psychometrician"/>
+					<xs:enumeration value="Scorer"/>
+					<xs:enumeration value="Tutor"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ident" type="xs:string" use="required"/>
+		<xs:attribute name="title" type="xs:string"/>
+	</xs:complexType>
+	
+	<!-- *************** -->
+	<!-- ** matemtext ** -->
+	<!-- *************** -->
+	<xs:complexType name="matemtextType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="texttype" type="xs:string" default="text/plain"/>
+				<xs:attribute name="label" type="xs:string"/>
+				<xs:attribute name="charset" type="xs:string" default="ascii-us"/>
+				<xs:attribute name="uri" type="xs:string"/>
+				<xs:attribute name="entityref" type="xs:ENTITY"/>
+				<xs:attribute name="height" type="xs:string"/>
+				<xs:attribute name="width" type="xs:string"/>
+				<xs:attribute ref="xml:lang"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<!-- ************** -->
+	<!-- ** material ** -->
+	<!-- ************** -->
+	
+	<xs:complexType name="materialType">
+		<xs:sequence>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="mattext" type="mattextType"/>
+				<xs:element name="matemtext" type="matemtextType"/>
+				<xs:element name="matimage" type="matimageType"/>
+				<xs:element name="matref" type="matrefType"/>
+			</xs:choice>
+			<xs:element name="altmaterial" type="altmaterialType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="label" type="xs:string"/>
+	</xs:complexType>
+	
+	<!-- ************** -->
+	<!-- ** matimage ** -->
+	<!-- ************** -->
+	<xs:complexType name="matimageType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="imagtype" type="xs:string" default="image/jpeg"/>
+				<xs:attribute name="label" type="xs:string"/>
+				<xs:attribute name="height" type="xs:string"/>
+				<xs:attribute name="uri" type="xs:string"/>
+				<xs:attribute name="embedded" type="xs:string" default="base64"/>
+				<xs:attribute name="width" type="xs:string"/>
+				<xs:attribute name="entityref" type="xs:ENTITY"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<!-- ************ -->
+	<!-- ** matref ** -->
+	<!-- ************ -->
+	<xs:complexType name="matrefType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="linkrefid" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<!-- ************* -->
+	<!-- ** mattext ** -->
+	<!-- ************* -->
+	<xs:complexType name="mattextType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="texttype" type="xs:string" default="text/plain"/>
+				<xs:attribute name="label" type="xs:string"/>
+				<xs:attribute name="charset" type="xs:string" default="ascii-us"/>
+				<xs:attribute name="uri" type="xs:string"/>
+				<xs:attribute name="entityref" type="xs:ENTITY"/>
+				<xs:attribute name="height" type="xs:string"/>
+				<xs:attribute name="width" type="xs:string"/>
+				<xs:attribute ref="xml:lang"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<!-- ********* -->
+	<!-- ** not ** -->
+	<!-- ********* -->
+	<xs:complexType name="notType">
+		<xs:choice>
+			<xs:element name="unanswered" type="unansweredType"/>
+			<xs:element name="varequal" type="varequalType"/>
+		</xs:choice>
+	</xs:complexType>
+	
+	<!-- **************** -->
+	<!-- ** objectives ** -->
+	<!-- **************** -->
+	<xs:complexType name="objectivesType">
+		<xs:sequence>
+			<xs:element name="material" type="materialType" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="view" default="All">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="All"/>
+					<xs:enumeration value="Administrator"/>
+					<xs:enumeration value="AdminAuthority"/>
+					<xs:enumeration value="Assessor"/>
+					<xs:enumeration value="Author"/>
+					<xs:enumeration value="Candidate"/>
+					<xs:enumeration value="InvigilatorProctor"/>
+					<xs:enumeration value="Psychometrician"/>
+					<xs:enumeration value="Scorer"/>
+					<xs:enumeration value="Tutor"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	
+	<!-- ************** -->
+	<!-- ** outcomes ** -->
+	<!-- ************** -->
+	<xs:complexType name="outcomesType">
+		<xs:sequence>
+			<xs:element name="decvar" type="decvarType"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- ****************** -->
+	<!-- ** presentation ** -->
+	<!-- ****************** -->
+	<xs:complexType name="presentationType">
+		<xs:sequence>
+			<xs:element name="material" type="materialType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="response_lid" type="response_lidType"/>
+			<xs:element name="material" type="materialType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="label" type="xs:string"/>
+	</xs:complexType>
+	
+	<!-- ********************* -->
+	<!-- ** questestinterop ** -->
+	<!-- ********************* -->
+	<xs:complexType name="questestinteropType">
+		<xs:sequence>
+			<xs:element name="item" type="itemType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- ******************* -->
+	<!-- ** render_choice ** -->
+	<!-- ******************* -->
+	<xs:complexType name="render_choiceType">
+		<xs:sequence>
+			<xs:element name="response_label" type="response_labelType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="shuffle" default="No">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="Yes"/>
+					<xs:enumeration value="No"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="minnumber" type="xs:string" fixed="1"/>
+		<xs:attribute name="maxnumber" type="xs:string" fixed="1"/>
+	</xs:complexType>
+	
+	<!-- ******************* -->
+	<!-- ** respcondition ** -->
+	<!-- ******************* -->
+	<xs:complexType name="respconditionType">
+		<xs:sequence>
+			<xs:element name="conditionvar" type="conditionvarType"/>
+			<xs:element name="setvar" type="setvarType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="displayfeedback" type="displayfeedbackType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="continue" default="No">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="Yes"/>
+					<xs:enumeration value="No"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="title" type="xs:string"/>
+	</xs:complexType>
+	
+	<!-- ******************** -->
+	<!-- ** response_label ** -->
+	<!-- ******************** -->
+	<xs:complexType name="response_labelType">
+		<xs:sequence>
+			<xs:element name="material" type="materialType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="rshuffle" default="Yes">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="Yes"/>
+					<xs:enumeration value="No"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="labelrefid" type="xs:string"/>
+		<xs:attribute name="ident" type="xs:string" use="required"/>
+	</xs:complexType>
+	
+	<!-- ****************** -->
+	<!-- ** response_lid ** -->
+	<!-- ****************** -->
+	<xs:complexType name="response_lidType">
+		<xs:sequence>
+			<xs:element name="render_choice" type="render_choiceType"/>
+		</xs:sequence>
+		<xs:attribute name="rcardinality" default="Single">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="Single"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ident" type="xs:string" use="required"/>
+		<xs:attribute name="rtiming" default="No">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="No"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	
+	<!-- ******************* -->
+	<!-- ** resprocessing ** -->
+	<!-- ******************* -->
+	<xs:complexType name="resprocessingType">
+		<xs:sequence>
+			<xs:element name="outcomes" type="outcomesType"/>
+			<xs:element name="respcondition" type="respconditionType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- ************ -->
+	<!-- ** rubric ** -->
+	<!-- ************ -->
+	<xs:complexType name="rubricType">
+		<xs:sequence>
+			<xs:element name="material" type="materialType" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="view" default="All">
+			<xs:simpleType>
+				<xs:restriction base="xs:NMTOKEN">
+					<xs:enumeration value="All"/>
+					<xs:enumeration value="Administrator"/>
+					<xs:enumeration value="AdminAuthority"/>
+					<xs:enumeration value="Assessor"/>
+					<xs:enumeration value="Author"/>
+					<xs:enumeration value="Candidate"/>
+					<xs:enumeration value="InvigilatorProctor"/>
+					<xs:enumeration value="Psychometrician"/>
+					<xs:enumeration value="Scorer"/>
+					<xs:enumeration value="Tutor"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	
+	<!-- ************ -->
+	<!-- ** setvar ** -->
+	<!-- ************ -->
+	<xs:complexType name="setvarType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="varname" type="xs:string" default="SCORE"/>
+				<xs:attribute name="action" default="Set">
+					<xs:simpleType>
+						<xs:restriction base="xs:NMTOKEN">
+							<xs:enumeration value="Set"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<!-- **************** -->
+	<!-- ** unanswered ** -->
+	<!-- **************** -->
+	<xs:complexType name="unansweredType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="respident" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<!-- ************** -->
+	<!-- ** varequal ** -->
+	<!-- ************** -->
+	<xs:complexType name="varequalType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="respident" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+</xs:schema>

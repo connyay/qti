@@ -1,0 +1,54 @@
+title: Sample Math and Science Quiz
+
+1. What is 2 + 2?
+a) 3
+*b) 4
+c) 5
+d) 6
+feedback: Correct! 2 + 2 equals 4.
+
+2. Select all prime numbers between 1 and 10:
+[*] 2
+[*] 3
+[ ] 4
+[*] 5
+[ ] 6
+[*] 7
+[ ] 8
+[ ] 9
+[ ] 10
+
+3. What is the capital of France?
+* Paris
+* paris
+* PARIS
+
+4. Calculate the value of π to 2 decimal places.
+= 3.14 ± 0.01
+
+5. Explain Newton's first law of motion in your own words.
+___
+
+6. What is the largest planet in our solar system?
+a) Earth
+b) Mars
+*c) Jupiter
+d) Venus
+
+7. Name any noble gas from the periodic table.
+* Helium
+* Neon
+* Argon
+* Krypton
+* Xenon
+* Radon
+
+8. True or False: Water boils at 100°C at sea level.
+*a) True
+b) False
+
+9. Calculate 15% of 200.
+= 30
+
+10. Write a short paragraph about the importance of renewable energy.
+___

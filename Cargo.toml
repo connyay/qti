@@ -1,6 +1,41 @@
 [package]
 name = "qti"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+authors = ["Connor Hindley"]
+description = "A schema-driven QTI (Question and Test Interoperability) file generator"
+license = "MIT"
 
 [dependencies]
+# XML processing and validation
+quick-xml = { version = "0.36", features = ["serialize"] }
+serde = { version = "1.0", features = ["derive"] }
+serde-xml-rs = "0.6"
+xmltree = "0.10"
+
+# Schema validation
+# Note: xsd-parser crates are currently yanked, using manual schema for now
+
+# Text parsing
+nom = "7.1"
+pulldown-cmark = "0.12"
+regex = "1.10"
+
+# File handling and compression
+zip = "0.6"
+base64 = "0.22"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# CLI
+clap = { version = "4.5", features = ["derive"] }
+
+# Utils
+chrono = "0.4"
+uuid = { version = "1.8", features = ["v4"] }
+
+[dev-dependencies]
+tempfile = "3.10"
+pretty_assertions = "1.4"

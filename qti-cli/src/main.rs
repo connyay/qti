@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::{Parser as ClapParser, Subcommand};
-use qti::{Exporter, Generator, Parser};
+use qti_lib::{Exporter, Generator, Parser};
 use std::fs;
 use std::path::PathBuf;
 
@@ -85,11 +85,9 @@ fn generate_qti(
 
     let content = fs::read_to_string(&input)?;
 
-    // Parse the input
     let parser = Parser::new();
     let mut assessment = parser.parse(&content)?;
 
-    // Set a better identifier
     let stem = input
         .file_stem()
         .and_then(|s| s.to_str())
@@ -98,9 +96,7 @@ fn generate_qti(
 
     println!("Parsed {} questions", assessment.questions.len());
 
-    // Generate output
     if xml_only {
-        // Generate XML only
         let generator = if canvas {
             Generator::new().with_canvas_extensions()
         } else {
@@ -114,7 +110,6 @@ fn generate_qti(
         fs::write(&output_path, xml)?;
         println!("Generated QTI XML: {}", output_path.display());
     } else {
-        // Generate full QTI package
         let mut exporter = if canvas {
             Exporter::new().with_canvas_extensions()
         } else {
@@ -139,7 +134,7 @@ fn validate_file(file: PathBuf) -> Result<()> {
 
     let content = fs::read_to_string(&file)?;
 
-    let validator = qti::validator::Validator::new();
+    let validator = qti_lib::validator::Validator::new();
     validator.validate_xml(&content)?;
 
     println!("✓ Valid QTI XML");

@@ -1,0 +1,8 @@
+# Wrangler
+.wrangler/
+worker/
+build/
+dist/
+
+# Node modules (if you add any JS tooling)
+node_modules/

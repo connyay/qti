@@ -1,0 +1,10 @@
+name = "cfw-qti"
+compatibility_date = "2024-01-01"
+main = "build/worker/shim.mjs"
+
+[build]
+command = "cargo install -q worker-build && worker-build --release"
+
+# AI binding for quiz generation
+[ai]
+binding = "AI"

@@ -25,7 +25,6 @@ impl QtiBuilder {
     pub fn build_questestinterop(&self, assessment: &Assessment) -> Result<Element> {
         let mut root = Element::new("questestinterop");
 
-        // Set namespaces
         root.attributes.insert(
             "xmlns".to_string(),
             "http://www.imsglobal.org/xsd/ims_qtiasiv1p2".to_string(),
@@ -39,14 +38,12 @@ impl QtiBuilder {
             "http://www.imsglobal.org/xsd/ims_qtiasiv1p2 http://www.imsglobal.org/xsd/ims_qtiasiv1p2p1.xsd".to_string()
         );
 
-        // Build assessment element
         let assessment_elem = self.build_assessment(assessment)?;
         root.children.push(XMLNode::Element(assessment_elem));
 
         Ok(root)
     }
 
-    /// Build assessment element
     fn build_assessment(&self, assessment: &Assessment) -> Result<Element> {
         let mut elem = Element::new("assessment");
         elem.attributes
@@ -54,13 +51,11 @@ impl QtiBuilder {
         elem.attributes
             .insert("title".to_string(), assessment.title.clone());
 
-        // Add metadata
         if self.canvas_extensions {
             elem.children
                 .push(XMLNode::Element(self.build_qtimetadata(assessment)?));
         }
 
-        // Add section with all items
         let section = self.build_section(assessment)?;
         elem.children.push(XMLNode::Element(section));
 
@@ -70,14 +65,12 @@ impl QtiBuilder {
     fn build_qtimetadata(&self, assessment: &Assessment) -> Result<Element> {
         let mut metadata = Element::new("qtimetadata");
 
-        // Time limit
         if let Some(time_limit) = assessment.time_limit {
             metadata.children.push(XMLNode::Element(
                 self.build_qtimetadatafield("time_limit", &time_limit.to_string()),
             ));
         }
 
-        // Shuffle settings
         if assessment.metadata.shuffle_questions {
             metadata.children.push(XMLNode::Element(
                 self.build_qtimetadatafield("shuffle_questions", "true"),
@@ -116,7 +109,6 @@ impl QtiBuilder {
             .attributes
             .insert("title".to_string(), "Main Section".to_string());
 
-        // Add all questions as items
         for question in &assessment.questions {
             let item = self.build_item(question)?;
             section.children.push(XMLNode::Element(item));
@@ -139,21 +131,17 @@ impl QtiBuilder {
             },
         );
 
-        // Add item metadata if using Canvas extensions
         if self.canvas_extensions {
             item.children
                 .push(XMLNode::Element(self.build_itemmetadata(question)?));
         }
 
-        // Add presentation
         item.children
             .push(XMLNode::Element(self.build_presentation(question)?));
 
-        // Add response processing
         item.children
             .push(XMLNode::Element(self.build_resprocessing(question)?));
 
-        // Add feedback if present
         if let Some(ref feedback) = question.feedback {
             if let Some(ref correct_feedback) = feedback.correct {
                 item.children.push(XMLNode::Element(
@@ -182,7 +170,7 @@ impl QtiBuilder {
         field.children.push(XMLNode::Element(label));
 
         let mut entry = Element::new("fieldentry");
-        let qtype = match &question.question_type {
+        let canvas_question_type = match &question.question_type {
             QuestionType::MultipleChoice { .. } => "multiple_choice_question",
             QuestionType::TrueFalse { .. } => "true_false_question",
             QuestionType::MultipleAnswer { .. } => "multiple_answers_question",
@@ -191,12 +179,13 @@ impl QtiBuilder {
             QuestionType::Essay { .. } => "essay_question",
             QuestionType::FileUpload { .. } => "file_upload_question",
         };
-        entry.children.push(XMLNode::Text(qtype.to_string()));
+        entry
+            .children
+            .push(XMLNode::Text(canvas_question_type.to_string()));
         field.children.push(XMLNode::Element(entry));
 
         metadata.children.push(XMLNode::Element(field));
 
-        // Points
         let mut points_field = Element::new("qtimetadatafield");
         let mut points_label = Element::new("fieldlabel");
         points_label
@@ -226,7 +215,6 @@ impl QtiBuilder {
         material.children.push(XMLNode::Element(mattext));
         presentation.children.push(XMLNode::Element(material));
 
-        // Add response based on question type
         match &question.question_type {
             QuestionType::MultipleChoice { choices, shuffle } => {
                 let response = self.build_response_lid(question, choices, *shuffle)?;
@@ -237,7 +225,6 @@ impl QtiBuilder {
                 presentation.children.push(XMLNode::Element(response));
             }
             QuestionType::TrueFalse { .. } => {
-                // True/False is a special case of multiple choice
                 let choices = vec![Choice::new("True", false), Choice::new("False", false)];
                 let response = self.build_response_lid(question, &choices, false)?;
                 presentation.children.push(XMLNode::Element(response));
@@ -255,7 +242,6 @@ impl QtiBuilder {
                 presentation.children.push(XMLNode::Element(response));
             }
             QuestionType::FileUpload { .. } => {
-                // File upload uses a special response type
                 let response = self.build_response_str(question)?;
                 presentation.children.push(XMLNode::Element(response));
             }
@@ -285,7 +271,6 @@ impl QtiBuilder {
             .attributes
             .insert("rcardinality".to_string(), rcardinality.to_string());
 
-        // Add render_choice
         let mut render = Element::new("render_choice");
         if shuffle {
             render
@@ -293,7 +278,6 @@ impl QtiBuilder {
                 .insert("shuffle".to_string(), "Yes".to_string());
         }
 
-        // Add response_label for each choice
         for choice in choices {
             let mut label = Element::new("response_label");
             label
@@ -327,7 +311,6 @@ impl QtiBuilder {
 
         let mut render = Element::new("render_fib");
 
-        // Set size based on question type
         match &question.question_type {
             QuestionType::ShortAnswer { .. } => {
                 render
@@ -370,8 +353,10 @@ impl QtiBuilder {
     fn build_resprocessing(&self, question: &Question) -> Result<Element> {
         let mut resprocessing = Element::new("resprocessing");
 
-        let outcomes = self.build_outcomes(question)?;
-        resprocessing.children.push(XMLNode::Element(outcomes));
+        resprocessing
+            .children
+            .push(XMLNode::Element(self.build_outcomes(question)?));
+
         match &question.question_type {
             QuestionType::MultipleChoice { choices, .. } => {
                 for choice in choices {
@@ -431,7 +416,6 @@ impl QtiBuilder {
             .attributes
             .insert("continue".to_string(), "No".to_string());
 
-        // Condition variable
         let mut condvar = Element::new("conditionvar");
         let mut varequal = Element::new("varequal");
         varequal
@@ -441,7 +425,6 @@ impl QtiBuilder {
         condvar.children.push(XMLNode::Element(varequal));
         condition.children.push(XMLNode::Element(condvar));
 
-        // Set score
         let mut setvar = Element::new("setvar");
         setvar
             .attributes
@@ -475,7 +458,6 @@ impl QtiBuilder {
             .attributes
             .insert("continue".to_string(), "Yes".to_string());
 
-        // Condition variable
         let mut condvar = Element::new("conditionvar");
         let mut varequal = Element::new("varequal");
         varequal
@@ -485,7 +467,6 @@ impl QtiBuilder {
         condvar.children.push(XMLNode::Element(varequal));
         condition.children.push(XMLNode::Element(condvar));
 
-        // Set score (partial credit if enabled)
         let mut setvar = Element::new("setvar");
         setvar
             .attributes

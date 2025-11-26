@@ -1,0 +1,17 @@
+[package]
+name = "qti-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Command-line tool for QTI file generation"
+
+[[bin]]
+name = "qti"
+path = "src/main.rs"
+
+[dependencies]
+qti-lib.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+xmltree.workspace = true

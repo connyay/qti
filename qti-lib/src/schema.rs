@@ -26,19 +26,17 @@ pub struct AttributeDef {
 }
 
 impl QtiSchema {
-    /// Load and parse XSD schema file
     pub fn from_xsd_file(path: impl AsRef<Path>) -> Result<Self> {
         let content = std::fs::read_to_string(path)?;
         Self::from_xsd_string(&content)
     }
 
-    /// Parse XSD schema from string
     /// Currently returns hardcoded schema; full XSD parsing not yet implemented
     pub fn from_xsd_string(_xsd: &str) -> Result<Self> {
         Ok(Self::qti_1_2_schema())
     }
 
-    /// Returns QTI 1.2 schema definitions based on ims_qtiasiv1p2p1.xsd specification
+    /// QTI 1.2 schema definitions based on ims_qtiasiv1p2p1.xsd specification
     pub fn qti_1_2_schema() -> Self {
         Self {
             root: "questestinterop".to_string(),
@@ -282,7 +280,12 @@ impl QtiSchema {
                     name: "conditionvar".to_string(),
                     attributes: vec![],
                     required: false,
-                    children: vec!["varequal".to_string(), "and".to_string(), "or".to_string(), "not".to_string()],
+                    children: vec![
+                        "varequal".to_string(),
+                        "and".to_string(),
+                        "or".to_string(),
+                        "not".to_string(),
+                    ],
                 },
                 ElementDef {
                     name: "varequal".to_string(),
@@ -312,7 +315,11 @@ impl QtiSchema {
                         AttributeDef {
                             name: "action".to_string(),
                             required: false,
-                            values: Some(vec!["Set".to_string(), "Add".to_string(), "Subtract".to_string()]),
+                            values: Some(vec![
+                                "Set".to_string(),
+                                "Add".to_string(),
+                                "Subtract".to_string(),
+                            ]),
                         },
                     ],
                     required: false,
@@ -398,14 +405,12 @@ impl QtiSchema {
         }
     }
 
-    /// Validate an XML element against the schema
     pub fn validate(&self, element: &Element) -> Result<()> {
         self.validate_element(element, &self.root)?;
         Ok(())
     }
 
     fn validate_element(&self, element: &Element, expected_name: &str) -> Result<()> {
-        // Check element name
         if element.name != expected_name {
             return Err(QtiError::ValidationError(format!(
                 "Expected element '{}', found '{}'",
@@ -413,7 +418,6 @@ impl QtiSchema {
             )));
         }
 
-        // Find element definition
         let element_def = self
             .elements
             .iter()
@@ -422,9 +426,8 @@ impl QtiSchema {
                 QtiError::ValidationError(format!("Unknown element: {}", element.name))
             })?;
 
-        // Validate attributes
         for attr_def in &element_def.attributes {
-            // Skip namespace attributes as they're handled differently by XML parsers
+            // Namespace attributes are handled differently by XML parsers
             if attr_def.name.starts_with("xmlns") {
                 continue;
             }
@@ -436,7 +439,6 @@ impl QtiSchema {
                 )));
             }
 
-            // Check enumerated values if specified
             if let Some(value) = element.attributes.get(&attr_def.name) {
                 if let Some(ref valid_values) = attr_def.values {
                     if !valid_values.contains(value) {
@@ -449,17 +451,14 @@ impl QtiSchema {
             }
         }
 
-        // Recursively validate children
         for child in &element.children {
             if let XMLNode::Element(child_element) = child {
-                // Check if child is allowed
                 if !element_def.children.contains(&child_element.name) {
                     return Err(QtiError::ValidationError(format!(
                         "Unexpected child element '{}' in '{}'",
                         child_element.name, element.name
                     )));
                 }
-                // Validate the child element
                 self.validate_element(child_element, &child_element.name)?;
             }
         }
@@ -478,7 +477,6 @@ mod tests {
         assert_eq!(schema.root, "questestinterop");
         assert!(!schema.elements.is_empty());
 
-        // Check that assessment element is defined
         let assessment = schema
             .elements
             .iter()

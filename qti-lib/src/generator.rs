@@ -41,16 +41,13 @@ impl Generator {
         Ok(())
     }
 
-    /// Convert Element to XML string
     fn element_to_xml_string(&self, element: &Element) -> Result<String> {
         let mut buf = Vec::new();
         self.write_element(&mut buf, element)?;
         String::from_utf8(buf).map_err(|e| QtiError::Utf8Error(e.utf8_error()))
     }
 
-    /// Write element to a writer
     fn write_element<W: Write>(&self, mut writer: W, element: &Element) -> Result<()> {
-        // Configure and write the element (includes XML declaration)
         let config = xmltree::EmitterConfig::new()
             .perform_indent(self.pretty_print)
             .indent_string("  ")
@@ -60,7 +57,6 @@ impl Generator {
         Ok(())
     }
 
-    /// Generate a complete QTI package
     pub fn generate_package(&self, assessment: &Assessment) -> Result<QtiPackage> {
         let xml = self.generate(assessment)?;
         let manifest = self.generate_manifest(assessment)?;
@@ -75,7 +71,6 @@ impl Generator {
     fn generate_manifest(&self, assessment: &Assessment) -> Result<String> {
         let mut manifest = Element::new("manifest");
 
-        // Set attributes
         manifest.attributes.insert(
             "identifier".to_string(),
             format!("{}_manifest", assessment.identifier),

@@ -1,9 +1,8 @@
-use regex::Regex;
 use crate::error::{QtiError, Result};
 use crate::types::{AcceptableAnswer, Assessment, Choice, Feedback, Question, QuestionType};
+use regex::Regex;
 
 pub struct Parser {
-    /// Regex patterns matching text2qti format
     question_pattern: Regex,
     mc_correct_pattern: Regex,
     mc_incorrect_pattern: Regex,
@@ -59,7 +58,6 @@ impl Parser {
         Ok(assessment)
     }
 
-    /// Extract title from metadata or first line
     fn extract_title(&self, lines: &[&str]) -> Option<String> {
         for line in lines.iter().take(5) {
             if line.starts_with("title:") || line.starts_with("Title:") {
@@ -72,18 +70,14 @@ impl Parser {
         None
     }
 
-    /// Parse a single question starting at position i
     fn parse_question(&self, lines: &[&str], i: &mut usize) -> Result<Question> {
-        // Extract question text
         let question_line = lines[*i];
         let text = self.question_pattern.replace(question_line, "").to_string();
         *i += 1;
 
-        // Determine question type by looking ahead
-        let question_type = self.determine_question_type(lines, *i)?;
+        let question_type_hint = self.determine_question_type(lines, *i)?;
 
-        // Parse based on question type
-        let question_type = match question_type {
+        let question_type = match question_type_hint {
             QuestionTypeHint::MultipleChoice => self.parse_multiple_choice(lines, i)?,
             QuestionTypeHint::MultipleAnswer => self.parse_multiple_answer(lines, i)?,
             QuestionTypeHint::ShortAnswer => self.parse_short_answer(lines, i)?,
@@ -109,13 +103,11 @@ impl Parser {
 
         let mut question = Question::new(text, question_type);
 
-        // Check for feedback or solution after the choices
         self.parse_feedback_and_solution(lines, i, &mut question);
 
         Ok(question)
     }
 
-    /// Determine the question type by looking at the next lines
     fn determine_question_type(&self, lines: &[&str], start: usize) -> Result<QuestionTypeHint> {
         if start >= lines.len() {
             return Err(QtiError::ParseError("Unexpected end of input".to_string()));
@@ -144,7 +136,6 @@ impl Parser {
         }
     }
 
-    /// Parse multiple choice questions
     fn parse_multiple_choice(&self, lines: &[&str], i: &mut usize) -> Result<QuestionType> {
         let mut choices = Vec::new();
 
@@ -189,7 +180,6 @@ impl Parser {
         })
     }
 
-    /// Parse multiple answer questions
     fn parse_multiple_answer(&self, lines: &[&str], i: &mut usize) -> Result<QuestionType> {
         let mut choices = Vec::new();
 
@@ -225,7 +215,6 @@ impl Parser {
         })
     }
 
-    /// Parse short answer questions
     fn parse_short_answer(&self, lines: &[&str], i: &mut usize) -> Result<QuestionType> {
         let mut answers = Vec::new();
 
@@ -257,7 +246,6 @@ impl Parser {
         })
     }
 
-    /// Parse numerical questions
     fn parse_numerical(&self, lines: &[&str], i: &mut usize) -> Result<QuestionType> {
         let line = lines[*i];
 
@@ -286,7 +274,6 @@ impl Parser {
         }
     }
 
-    /// Parse feedback and solution that may follow a question
     fn parse_feedback_and_solution(&self, lines: &[&str], i: &mut usize, question: &mut Question) {
         let mut feedback = Feedback {
             correct: None,

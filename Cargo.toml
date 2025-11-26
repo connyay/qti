@@ -1,41 +1,52 @@
-[package]
-name = "qti"
+[workspace]
+members = [
+    "cfw-qti",
+    "qti-cli",
+    "qti-lib",
+]
+resolver = "2"
+
+[workspace.package]
 version = "0.1.0"
-edition = "2021"
 authors = ["Connor Hindley"]
-description = "A schema-driven QTI (Question and Test Interoperability) file generator"
 license = "MIT"
+edition = "2021"
 
-[dependencies]
-# XML processing and validation
-quick-xml = { version = "0.36", features = ["serialize"] }
-serde = { version = "1.0", features = ["derive"] }
-serde-xml-rs = "0.6"
-xmltree = "0.10"
-
-# Schema validation
-# Note: xsd-parser crates are currently yanked, using manual schema for now
-
-# Text parsing
+[workspace.dependencies]
+anyhow = "1.0"
+base64 = "0.22"
+chrono = "0.4"
 nom = "7.1"
 pulldown-cmark = "0.12"
 regex = "1.10"
-
-# File handling and compression
-zip = "0.6"
-base64 = "0.22"
-
-# Error handling
+serde-xml-rs = "0.6"
+serde_json = "1.0"
 thiserror = "1.0"
-anyhow = "1.0"
+worker = "0.6"
+xmltree = "0.10"
+zip = { version = "2.2", default-features = false, features = ["deflate"] }
 
-# CLI
-clap = { version = "4.5", features = ["derive"] }
+[workspace.dependencies.clap]
+version = "4.5"
+features = ["derive"]
 
-# Utils
-chrono = "0.4"
-uuid = { version = "1.8", features = ["v4"] }
+[workspace.dependencies.qti-lib]
+path = "qti-lib"
 
-[dev-dependencies]
-tempfile = "3.10"
-pretty_assertions = "1.4"
+[workspace.dependencies.quick-xml]
+version = "0.36"
+features = ["serialize"]
+
+[workspace.dependencies.serde]
+version = "1.0"
+features = ["derive"]
+
+[workspace.dependencies.uuid]
+version = "1.8"
+features = ["v4", "js"]
+
+# Optimize for size in release builds (important for Cloudflare Workers)
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1

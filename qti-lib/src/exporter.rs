@@ -45,15 +45,12 @@ impl Exporter {
         assessment: &Assessment,
         writer: W,
     ) -> Result<()> {
-        // Generate the package
         let package = self.generator.generate_package(assessment)?;
 
-        // Validate if enabled
         if self.validate_before_export {
             self.validator.validate_xml(&package.assessment_xml)?;
         }
 
-        // Create zip archive
         self.create_zip(package, writer)?;
 
         Ok(())
@@ -62,7 +59,7 @@ impl Exporter {
     fn create_zip<W: Write + Seek>(&self, package: QtiPackage, writer: W) -> Result<()> {
         let mut zip = ZipWriter::new(writer);
 
-        let options = FileOptions::default()
+        let options = FileOptions::<()>::default()
             .compression_method(CompressionMethod::Deflated)
             .unix_permissions(0o644);
 
@@ -82,7 +79,6 @@ impl Exporter {
         Ok(())
     }
 
-    /// Extract assessment identifier from XML by parsing it (somewhat inefficient but simple)
     fn extract_assessment_ident(&self, xml: &str) -> Result<String> {
         let element = xmltree::Element::parse(xml.as_bytes())
             .map_err(|e| QtiError::XmlError(format!("Failed to parse XML: {}", e)))?;
@@ -98,7 +94,6 @@ impl Exporter {
             .ok_or_else(|| QtiError::XmlError("Assessment missing ident attribute".to_string()))
     }
 
-    /// Export assessment to XML string (without packaging)
     pub fn export_to_xml(&self, assessment: &Assessment) -> Result<String> {
         let xml = self.generator.generate(assessment)?;
 
@@ -109,7 +104,6 @@ impl Exporter {
         Ok(xml)
     }
 
-    /// Export assessment and return package contents in memory
     pub fn export_to_memory(&self, assessment: &Assessment) -> Result<Vec<u8>> {
         let mut buffer = std::io::Cursor::new(Vec::new());
         self.export_to_writer(assessment, &mut buffer)?;
@@ -131,7 +125,6 @@ mod tests {
 
     #[test]
     fn test_export_to_file() {
-        // Create assessment
         let mut assessment = Assessment::new("Test Quiz");
         assessment.identifier = "quiz_123".to_string();
 
@@ -149,18 +142,15 @@ mod tests {
         );
         assessment.questions.push(question);
 
-        // Export to temp file
         let temp_file = NamedTempFile::new().expect("Should create temp file");
         let exporter = Exporter::new();
         exporter
             .export_to_file(&assessment, temp_file.path())
             .expect("Should export to file");
 
-        // Verify file exists and is not empty
         let metadata = std::fs::metadata(temp_file.path()).expect("Should get file metadata");
         assert!(metadata.len() > 0, "Exported file should not be empty");
 
-        // Verify it's a valid zip file
         let file = std::fs::File::open(temp_file.path()).expect("Should open file");
         let archive = zip::ZipArchive::new(file).expect("Should be valid zip file");
         assert!(

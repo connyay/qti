@@ -1,6 +1,14 @@
 # QTI Generator
 
-A schema-driven QTI (Question and Test Interoperability) file generator written in Rust. This tool converts simple markdown-style text files into valid QTI 1.2 XML packages that can be imported into learning management systems like Canvas.
+A schema-driven QTI (Question and Test Interoperability) file generator written in Rust. This monorepo contains a library, CLI tool, and Cloudflare Worker for converting simple markdown-style text files into valid QTI 1.2 XML packages that can be imported into learning management systems like Canvas.
+
+## Workspace Structure
+
+This is a Cargo workspace with the following packages:
+
+- **qti-lib**: Core library for QTI generation and validation
+- **qti-cli**: Command-line tool for local QTI file generation
+- **cfw-qti**: Cloudflare Worker with web interface for QTI generation
 
 ## Features
 
@@ -14,37 +22,71 @@ A schema-driven QTI (Question and Test Interoperability) file generator written 
 ## Installation
 
 ```bash
+# Build all workspace packages
 cargo build --release
+
+# Build specific package
+cargo build --release -p qti-cli
+cargo build --release -p qti-lib
 ```
 
 ## Usage
 
-### Show example input format
+### CLI Tool
+
+#### Show example input format
 
 ```bash
-cargo run -- example
+cargo run -p qti-cli -- example
 ```
 
-### Generate QTI package from text file
+#### Generate QTI package from text file
 
 ```bash
 # Generate complete QTI zip package
-cargo run -- generate --input quiz.txt
+cargo run -p qti-cli -- generate --input quiz.txt
 
 # Generate XML only (no zip)
-cargo run -- generate --input quiz.txt --xml-only
+cargo run -p qti-cli -- generate --input quiz.txt --xml-only
 
 # Include Canvas-specific extensions
-cargo run -- generate --input quiz.txt --canvas
+cargo run -p qti-cli -- generate --input quiz.txt --canvas
 
 # Skip validation
-cargo run -- generate --input quiz.txt --skip-validation
+cargo run -p qti-cli -- generate --input quiz.txt --skip-validation
 ```
 
-### Validate existing QTI XML
+#### Validate existing QTI XML
 
 ```bash
-cargo run -- validate --file quiz.xml
+cargo run -p qti-cli -- validate --file quiz.xml
+```
+
+### Library Usage
+
+Add to your `Cargo.toml`:
+
+```toml
+[dependencies]
+qti-lib = { path = "path/to/qti-lib" }
+```
+
+Example:
+
+```rust
+use qti_lib::{Parser, Generator, Exporter};
+
+// Parse input text
+let parser = Parser::new();
+let assessment = parser.parse(input_text)?;
+
+// Generate XML
+let generator = Generator::new();
+let xml = generator.generate(&assessment)?;
+
+// Or create a complete package
+let exporter = Exporter::new();
+exporter.export_to_file(&assessment, "output.zip")?;
 ```
 
 ## Input Format
@@ -91,7 +133,9 @@ ___
 
 ## Architecture
 
-The project is structured with clean separation of concerns:
+### Library Structure (`qti-lib`)
+
+The library is structured with clean separation of concerns:
 
 - `parser`: Parses text input into internal representation
 - `types`: Core data structures for assessments and questions
@@ -100,6 +144,15 @@ The project is structured with clean separation of concerns:
 - `validator`: Schema validation against QTI 1.2
 - `exporter`: Creates QTI packages with manifest
 - `schema`: XSD-based schema definitions
+
+### Workspace Benefits
+
+Using a Cargo workspace provides:
+
+- Shared dependencies across packages
+- Single `Cargo.lock` for consistent dependency versions
+- Easy to build and test all packages together
+- Library can be used by both CLI and Cloudflare Worker
 
 ## Key Improvements Over text2qti
 
@@ -127,9 +180,21 @@ b) 5
 * yellow" > my_quiz.txt
 
 # Generate QTI package
-cargo run -- generate --input my_quiz.txt
+cargo run -p qti-cli -- generate --input my_quiz.txt
 
 # Result: my_quiz.zip ready for LMS import
+```
+
+## Cloudflare Worker
+
+The `cfw-qti` package provides a REST API for QTI generation. This is still in development.
+
+To develop the worker locally:
+
+```bash
+cd cfw-qti
+npm install -g wrangler
+wrangler dev
 ```
 
 ## License

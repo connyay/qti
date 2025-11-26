@@ -1,8 +1,3 @@
-// QTI Generator Library
-//
-// A schema-driven QTI (Question and Test Interoperability) file generator
-// that validates against official QTI 1.2 XSD specifications.
-
 pub mod builder;
 pub mod error;
 pub mod exporter;

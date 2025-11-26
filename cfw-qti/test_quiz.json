@@ -1,0 +1,5 @@
+{
+  "content": "title: Sample Quiz\n\n1. What is 2 + 2?\na) 3\n*b) 4\nc) 5\nd) 6\nfeedback: Great job!\n\n2. Select all prime numbers:\n[*] 2\n[*] 3\n[ ] 4\n[*] 5\n[ ] 6\n\n3. What is the capital of France?\n* Paris\n* paris",
+  "canvas": false,
+  "skip_validation": false
+}

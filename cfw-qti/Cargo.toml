@@ -1,0 +1,18 @@
+[package]
+name = "cfw-qti"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Cloudflare Worker for QTI services"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+qti-lib.workspace = true
+worker.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+console_error_panic_hook = "0.1"
